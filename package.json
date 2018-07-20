@@ -1,0 +1,28 @@
+{
+  "name": "cachekit",
+  "version": "0.1.0",
+  "description": "Redis wrapper with extended features",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/seancheung/cachekit.git"
+  },
+  "keywords": [
+    "redis",
+    "cache",
+    "memory",
+    "promise"
+  ],
+  "author": "seancheung <theoxuanx@gmail.com> (https://seanz.me)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/seancheung/cachekit/issues"
+  },
+  "homepage": "https://github.com/seancheung/cachekit#readme",
+  "dependencies": {
+    "redis": "^2.8.0"
+  }
+}

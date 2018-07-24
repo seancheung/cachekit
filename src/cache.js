@@ -2,7 +2,10 @@ const { RedisClient } = require('redis');
 const SYMBOLS = require('./symbols');
 const Query = require('./query');
 const Multi = require('./multi');
+const { LockFailedError, TimeoutError } = require('./errors');
+const Locker = require('./locker');
 const wrapper = require('./wrapper');
+const injection = require('./injection');
 
 class Cache extends Query {
 
@@ -40,6 +43,109 @@ class Cache extends Query {
         return this.wrapper.ok(this.driver.script, 'debug', mode);
     }
 
+    lock(key, timeout, cb) {
+        if (!timeout || !cb) {
+            return this.set(key, Date.now(), { flag: 'NX' }).then(success => {
+                if (!success) {
+                    throw new LockFailedError();
+                }
+
+                return new Locker(() => this.del(key));
+            });
+        }
+        const tm = new injection.Promise((resolve, reject) => {
+            const id = setTimeout(() => {
+                clearTimeout(id);
+                reject(new TimeoutError());
+            }, timeout);
+        });
+
+        let locked;
+        const exec = this.set(key, Date.now(), {
+            flag: 'NX',
+            mode: 'PX',
+            duration: timeout
+        })
+            .then(success => {
+                if (!success) {
+                    throw new LockFailedError();
+                }
+                locked = true;
+
+                return cb.call(null, this);
+            })
+            .then(res => {
+                if (locked) {
+                    return this.del(key).then(() => res);
+                }
+            })
+            .catch(err => {
+                if (locked) {
+                    return this.del(key).then(() => {
+                        throw err;
+                    });
+                }
+                throw err;
+            });
+
+        return injection.Promise.race([exec, tm]);
+    }
+
+    mlock(key, timeout, cb) {
+        const tm = new injection.Promise((resolve, reject) => {
+            const id = setTimeout(() => {
+                clearTimeout(id);
+                reject(new TimeoutError());
+            }, timeout);
+        });
+
+        let locked, multi;
+        const exec = this.set(key, Date.now(), {
+            flag: 'NX',
+            mode: 'PX',
+            duration: timeout
+        })
+            .then(success => {
+                if (!success) {
+                    throw new LockFailedError();
+                }
+                locked = true;
+                multi = this.multi();
+
+                return cb.call(null, multi);
+            })
+            .then(() => {
+                if (locked) {
+                    return multi.exec(true);
+                }
+            })
+            .then(res => {
+                if (locked) {
+                    return this.del(key).then(() => res);
+                }
+            })
+            .catch(err => {
+                if (locked) {
+                    if (multi) {
+                        return multi.discard().then(() => {
+                            throw err;
+                        });
+                    }
+                }
+                throw err;
+            })
+            .catch(err => {
+                if (locked) {
+                    return this.del(key).then(() => {
+                        throw err;
+                    });
+                }
+                throw err;
+            });
+
+        return injection.Promise.race([exec, tm]);
+    }
+
     quit() {
         return this.wrapper.ok(this.driver.quit);
     }
@@ -48,9 +154,18 @@ class Cache extends Query {
         return this.quit();
     }
 
+    static get Promise() {
+        return injection.Promise;
+    }
+
+    static set Promise(value) {
+        injection.Promise = value;
+    }
+
 }
 
 Cache.Query = Query;
 Cache.Multi = Multi;
+Cache.LockFailedError = LockFailedError;
 
 module.exports = Cache;

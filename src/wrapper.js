@@ -1,13 +1,14 @@
 const SYMBOLS = require('./symbols');
+const injection = require('./injection');
 const parser = require('./parser');
 
 module.exports = context => {
     const wrapper = {};
     if (!context[SYMBOLS.PARSERS]) {
-        for (const method of parser) {
+        for (const method in parser) {
             wrapper[method] = (func, ...args) =>
-                new Promise((resolve, reject) => {
-                    func.call(null, ...args, (err, res) => {
+                new injection.Promise((resolve, reject) => {
+                    func.call(context[SYMBOLS.DRIVER], ...args, (err, res) => {
                         if (err) {
                             reject(err);
                         } else {
@@ -18,17 +19,17 @@ module.exports = context => {
                 });
         }
     } else {
-        for (const method of parser) {
+        for (const method in parser) {
             wrapper[method] = (func, ...args) => {
-                func.call(null, ...args);
+                func.call(context[SYMBOLS.DRIVER], ...args);
                 context[SYMBOLS.PARSERS].push(parser[method].bind(parser));
 
                 return context;
             };
         }
         wrapper.exec = (func, parse) =>
-            new Promise((resolve, reject) => {
-                func.call(null, (err, arr) => {
+            new injection.Promise((resolve, reject) => {
+                func.call(context[SYMBOLS.DRIVER], (err, arr) => {
                     if (err) {
                         reject(err);
                     } else {

@@ -1,5 +1,6 @@
-declare class Cache {
+import { ClientOpts } from 'redis';
 
+declare class Cache {
     /**
      * Create a cache instance.
      */
@@ -88,7 +89,10 @@ declare class Cache {
     /**
      * Incrementally iterate the keys space.
      */
-    scan(cursor: number, options?: Cache.CursorOptions): Promise<[number, any[]]>;
+    scan(
+        cursor: number,
+        options?: Cache.CursorOptions
+    ): Promise<[number, any[]]>;
     /**
      * Incrementally iterate the keys space with a wrapped cursor object.
      */
@@ -140,15 +144,26 @@ declare class Cache {
     /**
      * Increment the float value of a hash field by the given amount.
      */
-    hincrbyfloat(key: string, field: string, increment: number): Promise<number>;
+    hincrbyfloat(
+        key: string,
+        field: string,
+        increment: number
+    ): Promise<number>;
     /**
      * Incrementally iterate hash fields and associated values.
      */
-    hscan(key: string, cursor: number, options?: Cache.CursorOptions): Promise<[number, Map<string, any>]>;
+    hscan(
+        key: string,
+        cursor: number,
+        options?: Cache.CursorOptions
+    ): Promise<[number, Map<string, any>]>;
     /**
      * Incrementally iterate hash fields and associated values with a wrapped cursor object.
      */
-    hscanq(key: string, options?: Cache.CursorOptions): Cache.Query.Cursor<Map<string, any>>;
+    hscanq(
+        key: string,
+        options?: Cache.CursorOptions
+    ): Cache.Query.Cursor<Map<string, any>>;
     /**
      * Delete one or more hash fields.
      */
@@ -176,15 +191,26 @@ declare class Cache {
     /**
      * Incrementally iterate Set elements.
      */
-    sscan(key: string, cursor: number, options?: Cache.CursorOptions): Promise<[number, Set<any>]>;
+    sscan(
+        key: string,
+        cursor: number,
+        options?: Cache.CursorOptions
+    ): Promise<[number, Set<any>]>;
     /**
      * Incrementally iterate Set elements with a wrapped cursor object.
      */
-    sscanq(key: string, options?: Cache.CursorOptions): Cache.Query.Cursor<Set<any>>;
+    sscanq(
+        key: string,
+        options?: Cache.CursorOptions
+    ): Cache.Query.Cursor<Set<any>>;
     /**
      * Add one or more members to a sorted set, or update its score if it already exists.
      */
-    zadd(key: string, pairs: Cache.BatchSet<number, any>, options?: Cache.ZAddOptions): Promise<number>;
+    zadd(
+        key: string,
+        pairs: Cache.BatchSet<number, any>,
+        options?: Cache.ZAddOptions
+    ): Promise<number>;
     /**
      * Remove one or more members from a sorted set.
      */
@@ -212,51 +238,99 @@ declare class Cache {
     /**
      * Count the members in a sorted set with scores within the given values.
      */
-    zcount(key: string, min?: number|string, max?: number|string): Promise<number>;
+    zcount(
+        key: string,
+        min?: number | string,
+        max?: number | string
+    ): Promise<number>;
     /**
      * Remove all members in a sorted set within the given scores.
      */
-    zremrangebyscore(key: string, min?: number|string, max?: number|string): Promise<number>;
+    zremrangebyscore(
+        key: string,
+        min?: number | string,
+        max?: number | string
+    ): Promise<number>;
     /**
      * Return a range of members in a sorted set, by index.
      */
-    zrange(key: string, start?: number, stop?: number, options?: Cache.ZRangeOptions): Promise<any[]|[any, number][]>;
+    zrange(
+        key: string,
+        start?: number,
+        stop?: number,
+        options?: Cache.ZRangeOptions
+    ): Promise<any[] | [any, number][]>;
     /**
      * Return a range of members in a sorted set, by index, with scores ordered from high to low.
      */
-    zrevrange(key: string, start?: number, stop?: number, options?: Cache.ZRangeOptions): Promise<any[]|[any, number][]>;
+    zrevrange(
+        key: string,
+        start?: number,
+        stop?: number,
+        options?: Cache.ZRangeOptions
+    ): Promise<any[] | [any, number][]>;
     /**
      * Return a range of members in a sorted set, by score.
      */
-    zrangebyscore(key: string, min?: number|string, max?: number|string, options?: Cache.ZRangeScoreOptions): Promise<any[]|[any, number][]>;
+    zrangebyscore(
+        key: string,
+        min?: number | string,
+        max?: number | string,
+        options?: Cache.ZRangeScoreOptions
+    ): Promise<any[] | [any, number][]>;
     /**
      * Return a range of members in a sorted set, by score, with scores ordered from high to low.
      */
-    zrevrangebyscore(key: string, max?: number|string, min?: number|string, options?: Cache.ZRangeScoreOptions): Promise<any[]|[any, number][]>;
+    zrevrangebyscore(
+        key: string,
+        max?: number | string,
+        min?: number | string,
+        options?: Cache.ZRangeScoreOptions
+    ): Promise<any[] | [any, number][]>;
     /**
      * Incrementally iterate sorted sets elements and associated scores.
      */
-    zscan(key: string, cursor: number, options?: Cache.CursorOptions): Promise<[number, Array<[any, number]>]>;
+    zscan(
+        key: string,
+        cursor: number,
+        options?: Cache.CursorOptions
+    ): Promise<[number, Array<[any, number]>]>;
     /**
      * Incrementally iterate sorted sets elements and associated scores with a wrapped cursor object.
      */
-    zscanq(key: string, options?: Cache.CursorOptions): Cache.Query.Cursor<Array<[any, number]>>;
+    zscanq(
+        key: string,
+        options?: Cache.CursorOptions
+    ): Cache.Query.Cursor<Array<[any, number]>>;
     /**
      * Get value of a json object field by path.
      */
-    jget(key: string, path: string|Array<string|number>): Promise<any>;
+    jget(key: string, path: string | Array<string | number>): Promise<any>;
     /**
      * Set value of a json object field by path.
      */
-    jset(key: string, path: string|Array<string|number>, value: any): Promise<boolean>;
+    jset(
+        key: string,
+        path: string | Array<string | number>,
+        value: any
+    ): Promise<boolean>;
     /**
      * Get value of a json object field by path in a hash field.
      */
-    hjget(key: string, field: string, path: string|Array<string|number>): Promise<any>;
+    hjget(
+        key: string,
+        field: string,
+        path: string | Array<string | number>
+    ): Promise<any>;
     /**
      * Set value of a json object field by path in a hash field.
      */
-    hjset(key: string, field: string, path: string|Array<string|number>, value: any): Promise<boolean>;
+    hjset(
+        key: string,
+        field: string,
+        path: string | Array<string | number>,
+        value: any
+    ): Promise<boolean>;
     /**
      * Remove all keys matching the given pattern.
      */
@@ -301,6 +375,45 @@ declare class Cache {
     scriptdebug(): Promise<boolean>;
 
     /**
+     * Allocate a lock. If success, return a wrapped locker object(You'll need to manually call 'Locker.release()').
+     *
+     * Otherwise 'LockFailedError' will be thrown.
+     * 
+     * @param key lock key
+     */
+    lock(key: string): Promise<Cache.Locker>;
+
+    /**
+     * Allocate a lock. If success, execute the callback function.
+     *
+     * Otherwise 'LockFailedError' will be thrown.
+     * 
+     * If timeout after allocate success, 'TimeoutError' will be thrown and the callback will be aborted.
+     * 
+     * Returns the callback result.
+     * 
+     * @param key lock key
+     * @param timeout timeout in milliseconds
+     * @param cb callback
+     */
+    lock(key: string, timeout: number, cb: (cache: Cache) => any): Promise<any[]>;
+    
+    /**
+     * Allocate a lock. If success, execute the callback function with a multi object.
+     *
+     * Otherwise 'LockFailedError' will be thrown.
+     * 
+     * If timeout after allocate success, 'TimeoutError' will be thrown and the callback will be aborted.
+     * 
+     * Returns the multi exec results;
+     * 
+     * @param key lock key
+     * @param timeout timeout in milliseconds
+     * @param cb callback
+     */
+    mlock(key: string, timeout: number, cb: (multi: Cache.Multi) => void): Promise<any[]>;
+
+    /**
      * Close the connection.
      */
     quit(): Promise<boolean>;
@@ -309,76 +422,69 @@ declare class Cache {
      * Alias for 'quit'.
      */
     close(): Promise<boolean>;
+
+    static Promise: typeof Promise;
 }
 
 declare namespace Cache {
-    interface CacheOptions {
-        /**
-         * Cache key prefix
-         */
-        prefix: string;
-    }
-    
+    interface CacheOptions extends ClientOpts {}
+
     interface FlagOptions {
-        flag?: 'NX' | 'XX'; 
+        flag?: 'NX' | 'XX';
     }
-    
+
     interface DurationOptions {
         mode?: 'EX' | 'PX';
         duration?: number;
     }
-    
+
     interface SetOptions extends DurationOptions, FlagOptions {}
-    
+
     interface ZAddOptions extends FlagOptions {
         ch?: boolean;
         incr?: boolean;
     }
-    
+
     interface ZRangeOptions {
         withscores?: boolean;
     }
-    
+
     interface PaginationOptions {
         count?: number;
         offset?: number;
     }
-    
+
     interface ZRangeScoreOptions extends ZRangeOptions, PaginationOptions {}
-    
+
     interface CursorOptions {
         count?: number;
         pattern?: string;
     }
-    
+
     interface EvalOptions {
         args?: any[];
         keys?: any[];
     }
-    
+
     type BatchSet<T, U> = [T, U] | Array<[T, U]>;
 
-    abstract class Query {
-
-    }
+    abstract class Query {}
 
     namespace Query {
         class Cursor<T> {
-
             /**
              * Can continue iteration.
              */
             readonly next: boolean;
-            
+
             /**
              * Continue iteration.
              */
             fetch(): Promise<T>;
-        } 
+        }
     }
 
     class Multi extends Query {
-
         /**
          * Find all keys matching the given pattern.
          */
@@ -522,7 +628,10 @@ declare namespace Cache {
         /**
          * Incrementally iterate hash fields and associated values with a wrapped cursor object.
          */
-        hscanq(key: string, options?: CursorOptions): Query.Cursor<Map<string, any>>;
+        hscanq(
+            key: string,
+            options?: CursorOptions
+        ): Query.Cursor<Map<string, any>>;
         /**
          * Delete one or more hash fields.
          */
@@ -558,7 +667,11 @@ declare namespace Cache {
         /**
          * Add one or more members to a sorted set, or update its score if it already exists.
          */
-        zadd(key: string, pairs: BatchSet<number, any>, options?: ZAddOptions): this;
+        zadd(
+            key: string,
+            pairs: BatchSet<number, any>,
+            options?: ZAddOptions
+        ): this;
         /**
          * Remove one or more members from a sorted set.
          */
@@ -586,27 +699,51 @@ declare namespace Cache {
         /**
          * Count the members in a sorted set with scores within the given values.
          */
-        zcount(key: string, min?: number|string, max?: number|string): this;
+        zcount(key: string, min?: number | string, max?: number | string): this;
         /**
          * Remove all members in a sorted set within the given scores.
          */
-        zremrangebyscore(key: string, min?: number|string, max?: number|string): this;
+        zremrangebyscore(
+            key: string,
+            min?: number | string,
+            max?: number | string
+        ): this;
         /**
          * Return a range of members in a sorted set, by index.
          */
-        zrange(key: string, start?: number, stop?: number, options?: ZRangeOptions): this;
+        zrange(
+            key: string,
+            start?: number,
+            stop?: number,
+            options?: ZRangeOptions
+        ): this;
         /**
          * Return a range of members in a sorted set, by index, with scores ordered from high to low.
          */
-        zrevrange(key: string, start?: number, stop?: number, options?: ZRangeOptions): this;
+        zrevrange(
+            key: string,
+            start?: number,
+            stop?: number,
+            options?: ZRangeOptions
+        ): this;
         /**
          * Return a range of members in a sorted set, by score.
          */
-        zrangebyscore(key: string, min?: number|string, max?: number|string, options?: ZRangeScoreOptions): this;
+        zrangebyscore(
+            key: string,
+            min?: number | string,
+            max?: number | string,
+            options?: ZRangeScoreOptions
+        ): this;
         /**
          * Return a range of members in a sorted set, by score, with scores ordered from high to low.
          */
-        zrevrangebyscore(key: string, max?: number|string, min?: number|string, options?: ZRangeScoreOptions): this;
+        zrevrangebyscore(
+            key: string,
+            max?: number | string,
+            min?: number | string,
+            options?: ZRangeScoreOptions
+        ): this;
         /**
          * Incrementally iterate sorted sets elements and associated scores.
          */
@@ -614,23 +751,39 @@ declare namespace Cache {
         /**
          * Incrementally iterate sorted sets elements and associated scores with a wrapped cursor object.
          */
-        zscanq(key: string, options?: CursorOptions): Query.Cursor<Array<[any, number]>>;
+        zscanq(
+            key: string,
+            options?: CursorOptions
+        ): Query.Cursor<Array<[any, number]>>;
         /**
          * Get value of a json object field by path.
          */
-        jget(key: string, path: string|Array<string|number>): this;
+        jget(key: string, path: string | Array<string | number>): this;
         /**
          * Set value of a json object field by path.
          */
-        jset(key: string, path: string|Array<string|number>, value: any): this;
+        jset(
+            key: string,
+            path: string | Array<string | number>,
+            value: any
+        ): this;
         /**
          * Get value of a json object field by path in a hash field.
          */
-        hjget(key: string, field: string, path: string|Array<string|number>): this;
+        hjget(
+            key: string,
+            field: string,
+            path: string | Array<string | number>
+        ): this;
         /**
          * Set value of a json object field by path in a hash field.
          */
-        hjset(key: string, field: string, path: string|Array<string|number>, value: any): this;
+        hjset(
+            key: string,
+            field: string,
+            path: string | Array<string | number>,
+            value: any
+        ): this;
         /**
          * Remove all keys matching the given pattern.
          */
@@ -643,23 +796,28 @@ declare namespace Cache {
          * Execute a Lua script server side.
          */
         evalsha(sha1: string, options?: EvalOptions): this;
-    
+
         /**
          * Execute all commands issued after 'multi'.
          */
         exec(): Promise<void>;
-    
+
         /**
          * Execute all commands issued after 'multi'. Return parsed results.
          */
         exec(parse: true): Promise<any[]>;
-    
+
         /**
          * Discard all commands issued after 'multi'.
          */
         discard(): Promise<boolean>;
     }
-    
+
+    interface Locker {
+        release(): Promise<void>;
+    }
+
+    class LockFailedError extends Error {}
 }
 
 export = Cache;

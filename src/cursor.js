@@ -1,4 +1,5 @@
 const SYMBOLS = require('./symbols');
+const injection = require('./injection');
 
 class Cursor {
 
@@ -15,17 +16,18 @@ class Cursor {
         return this[SYMBOLS.CURSOR];
     }
 
-    async fetch() {
+    fetch() {
         if (this.next) {
-            const [cursor, res] = await this[SYMBOLS.EXEC].call(
-                null,
-                this[SYMBOLS.CURSOR] || 0,
-                this[SYMBOLS.OPTIONS]
-            );
-            this[SYMBOLS.CURSOR] = cursor;
+            return this[SYMBOLS.EXEC]
+                .call(null, this[SYMBOLS.CURSOR] || 0, this[SYMBOLS.OPTIONS])
+                .then(([cursor, res]) => {
+                    this[SYMBOLS.CURSOR] = cursor;
 
-            return res;
+                    return res;
+                });
         }
+
+        return injection.Promise.resolve();
     }
 
 }

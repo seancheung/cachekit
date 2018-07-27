@@ -6,6 +6,7 @@ const { LockFailedError, TimeoutError } = require('./errors');
 const Locker = require('./locker');
 const wrapper = require('./wrapper');
 const injection = require('./injection');
+const utils = require('./utils');
 
 class Cache extends Query {
 
@@ -144,6 +145,32 @@ class Cache extends Query {
             });
 
         return injection.Promise.race([exec, tm]);
+    }
+
+    ensure(key, fallback, options) {
+        return this.wrapper.value(this.driver.get, key).then(res => {
+            if (res == null && fallback != null) {
+                if (typeof fallback === 'function') {
+                    fallback = fallback.call();
+                }
+
+                return injection.Promise.resolve(fallback).then(value => {
+                    if (value === undefined) {
+                        throw new Error(
+                            'missing return value from fallback function'
+                        );
+                    }
+                    value = utils.serialize(value);
+                    options = utils.opts(options);
+
+                    return this.wrapper
+                        .ok(this.driver.set, key, value, ...options)
+                        .then(() => utils.deserialize(value));
+                });
+            }
+
+            return res;
+        });
     }
 
     quit() {

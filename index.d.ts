@@ -414,6 +414,11 @@ declare class Cache {
     mlock(key: string, timeout: number, cb: (multi: Cache.Multi) => void): Promise<any[]>;
 
     /**
+     * Get the value of a key with a fallback function or Promise. If key does not exist, fallback will be resolved and set then returned.
+     */
+    ensure(key: string, fallback: any, options?: Cache.SetOptions): Promise<any>;
+
+    /**
      * Close the connection.
      */
     quit(): Promise<boolean>;

@@ -1,7 +1,7 @@
 module.exports = {
     COUNT: 'local keys=redis.call("keys",ARGV[1]);return #keys',
     SETX:
-        'local ttl=redis.call("ttl",KEYS[1]);if ttl>0 then return redis.call("set",KEYS[1],ARGV[1],"EX",ttl) end',
+        'local ttl=redis.call("ttl",KEYS[1]);if ttl>0 then return redis.call("set",KEYS[1],ARGV[1],"EX",ttl) elseif ttl==-1 then return redis.call("set",KEYS[1],ARGV[1]) end',
     ZMSCORE:
         'local r={};for i,k in ipairs(ARGV) do r[i]=redis.call("zscore",KEYS[1],k) end;return r',
     JGET:
